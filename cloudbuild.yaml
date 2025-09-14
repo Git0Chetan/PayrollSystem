@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['clean', 'install']
+
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['jacoco:report']
+
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['cp', '-r', 'target/site/jacoco', 'gs://hackathon-automation-artifacts/jacoco-reports/$(date +%Y%m%d%H%M%S)']
+
+options:
+  machineType: 'E2_HIGHCPU_8'
