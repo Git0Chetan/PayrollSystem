@@ -1,12 +1,13 @@
 steps:
-  - name: 'gcr.io/cloud-builders/mvn'
+  # Use a builder with Java 21 support, or ensure Java 21 is installed
+  - name: 'maven:3.9-openjdk-21' # Example: using a Maven image with OpenJDK 21
     args: ['clean', 'install']
 
-  - name: 'gcr.io/cloud-builders/mvn'
+  - name: 'maven:3.9-openjdk-21' # Use the same builder for consistency
     args: ['jacoco:report']
 
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', '-r', 'target/site/jacoco', 'gs://hackathon-automation-artifacts/jacoco-reports/$(date +%Y%m%d%H%M%S)']
+    args: ['cp', '-r', 'target/site/jacoco', 'gs://YOUR_BUCKET_NAME/jacoco-reports/$(date +%Y%m%d%H%M%S)']
 
 options:
   default_logs_bucket_behavior: 'REGIONAL_USER_OWNED_BUCKET'
