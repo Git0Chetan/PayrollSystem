@@ -24,20 +24,47 @@ public class MainTest {
     }
 
     @Test
-    void testMainMethodPrintsExpectedOutput() {
-        // The main method does not use its arguments, so passing null is acceptable.
+    void testMainMethodOutputHappyPathEmptyArgs() {
+        String lineSeparator = System.lineSeparator();
+        StringBuilder expectedOutputBuilder = new StringBuilder();
+        expectedOutputBuilder.append("Hello and welcome!").append(lineSeparator);
+        for (int i = 1; i <= 5; i++) {
+            expectedOutputBuilder.append("i = ").append(i).append(lineSeparator);
+        }
+        String expectedOutput = expectedOutputBuilder.toString();
+
+        Main.main(new String[]{});
+
+        assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testMainMethodOutputHappyPathPopulatedArgs() {
+        String lineSeparator = System.lineSeparator();
+        StringBuilder expectedOutputBuilder = new StringBuilder();
+        expectedOutputBuilder.append("Hello and welcome!").append(lineSeparator);
+        for (int i = 1; i <= 5; i++) {
+            expectedOutputBuilder.append("i = ").append(i).append(lineSeparator);
+        }
+        String expectedOutput = expectedOutputBuilder.toString();
+
+        Main.main(new String[]{"arg1", "arg2"});
+
+        assertEquals(expectedOutput, outContent.toString());
+    }
+
+    @Test
+    void testMainMethodOutputEdgeCaseNullArgs() {
+        String lineSeparator = System.lineSeparator();
+        StringBuilder expectedOutputBuilder = new StringBuilder();
+        expectedOutputBuilder.append("Hello and welcome!").append(lineSeparator);
+        for (int i = 1; i <= 5; i++) {
+            expectedOutputBuilder.append("i = ").append(i).append(lineSeparator);
+        }
+        String expectedOutput = expectedOutputBuilder.toString();
+
         Main.main(null);
 
-        // Construct the expected output string precisely based on the Main class's behavior.
-        // printf does not add a newline, while println does.
-        String expectedOutput = "Hello and welcome!" +
-                                "i = 1" + System.lineSeparator() +
-                                "i = 2" + System.lineSeparator() +
-                                "i = 3" + System.lineSeparator() +
-                                "i = 4" + System.lineSeparator() +
-                                "i = 5" + System.lineSeparator();
-
-        // Assert that the captured standard output matches the expected string.
-        assertEquals(expectedOutput, outContent.toString(), "The output of the main method did not match expectations.");
+        assertEquals(expectedOutput, outContent.toString());
     }
 }
