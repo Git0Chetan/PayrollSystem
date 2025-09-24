@@ -45,5 +45,38 @@ jobs:
       # The '-B' flag runs Maven in batch mode (non-interactive).
       # 'clean install' will compile the code, run the tests, and package the application.
       # If any test fails, this step will fail, and the entire job will fail.
-      - name: Run tests with Maven
+      - name: Build, Test, and Generate Coverage Report
         run: mvn -B clean install
+            
+        # NEW: Upload the HTML coverage report as an artifact
+      - name: Upload Coverage Dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html-report
+          path: target/site/jacoco/
+
+      # NEW: Enforce a minimum coverage gate
+      - name: Check Coverage Gate
+        run: |
+          # This script parses the jacoco.csv file for the total instruction coverage
+          COVERAGE_MINIMUM=80 # Set your desired minimum coverage percentage here
+                
+          # Extract the last line of the CSV, which contains the totals
+          TOTALS_LINE=$(tail -n 1 target/site/jacoco/jacoco.csv)
+                
+          # Extract missed and covered instruction counts
+          INSTRUCTION_MISSED=$(echo "$TOTALS_LINE" | cut -d',' -f4)
+          INSTRUCTION_COVERED=$(echo "$TOTALS_LINE" | cut -d',' -f5)
+                
+          # Calculate the total instructions and the coverage percentage
+          TOTAL_INSTRUCTIONS=$(($INSTRUCTION_MISSED + $INSTRUCTION_COVERED))
+          COVERAGE_PERCENTAGE=$(awk "BEGIN {printf \"%.0f\", ($INSTRUCTION_COVERED/$TOTAL_INSTRUCTIONS)*100}")
+                
+          echo "Total Coverage: ${COVERAGE_PERCENTAGE}%"
+          echo "Required Minimum: ${COVERAGE_MINIMUM}%"
+                
+          if (( $(echo "$COVERAGE_PERCENTAGE < $COVERAGE_MINIMUM" | bc -l) )); then
+            echo "Error: Code coverage is below the ${COVERAGE_MINIMUM}% threshold."
+            exit 1
+          fi
+          echo "Success: Code coverage meets the required threshold."
