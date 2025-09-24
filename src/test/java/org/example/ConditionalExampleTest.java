@@ -23,14 +23,11 @@ public class ConditionalExampleTest {
     }
 
     @Test
-    void testMainMethodOutputForPassingScore() {
-        // The main method has a hardcoded score of 75, which is >= 60.
-        // Therefore, it should always print "You passed!".
+    void testMainMethodPrintsPassedForFixedScore() {
+        // The main method has a hardcoded score of 75, which is >= 60
         ConditionalExample.main(new String[]{});
 
-        String expectedOutput = "You passed!\n";
-        String actualOutput = outputStreamCaptor.toString();
-
-        assertEquals(expectedOutput, actualOutput, "The main method should print 'You passed!' for the hardcoded score.");
+        // Verify that "You passed!" is printed to standard output
+        assertEquals("You passed!\n", outputStreamCaptor.toString());
     }
 }
