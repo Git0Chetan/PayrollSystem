@@ -1,41 +1,42 @@
 package org.example;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BrainTest {
 
-    private final Brain brain = new Brain();
-
     @Test
     void testSayHelloWithName() {
-        String name = "Alice";
-        String expected = "Hello, Alice!";
-        String actual = brain.sayHello(name);
-        assertEquals(expected, actual, "Should return 'Hello, ' followed by the provided name.");
+        Brain brain = new Brain();
+        String result = brain.sayHello("World");
+        assertEquals("Hello, World!", result);
     }
 
     @Test
     void testSayHelloWithAnotherName() {
-        String name = "Bob";
-        String expected = "Hello, Bob!";
-        String actual = brain.sayHello(name);
-        assertEquals(expected, actual, "Should return 'Hello, ' followed by the provided name.");
-    }
-
-    @Test
-    void testSayHelloWithEmptyName() {
-        String name = "";
-        String expected = "Hello, !";
-        String actual = brain.sayHello(name);
-        assertEquals(expected, actual, "Should return 'Hello, !' for an empty name.");
+        Brain brain = new Brain();
+        String result = brain.sayHello("Alice");
+        assertEquals("Hello, Alice!", result);
     }
 
     @Test
     void testSayHelloWithNullName() {
-        String name = null;
-        String expected = "Hello, Brain Autoamtion!";
-        String actual = brain.sayHello(name);
-        assertEquals(expected, actual, "Should return 'Hello, Brain Autoamtion!' when name is null.");
+        Brain brain = new Brain();
+        String result = brain.sayHello(null);
+        assertEquals("Hello, Brain Autoamtion!", result);
+    }
+
+    @Test
+    void testSayHelloWithEmptyName() {
+        Brain brain = new Brain();
+        String result = brain.sayHello("");
+        assertEquals("Hello, !", result);
+    }
+
+    @Test
+    void testSayHelloWithSpecialCharactersInName() {
+        Brain brain = new Brain();
+        String result = brain.sayHello("J@ne D0e!");
+        assertEquals("Hello, J@ne D0e!!", result);
     }
 }

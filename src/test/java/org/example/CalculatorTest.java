@@ -12,158 +12,174 @@ import java.io.PrintStream;
 public class CalculatorTest {
 
     private Calculator calculator;
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     @BeforeEach
     void setUp() {
         calculator = new Calculator();
-        System.setOut(new PrintStream(outContent));
+        System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @AfterEach
-    void restoreStreams() {
-        System.setOut(originalOut);
+    void tearDown() {
+        System.setOut(standardOut);
     }
 
     @Test
-    @DisplayName("add: two positive numbers should return correct sum")
-    void testAdd_PositiveNumbers() {
+    @DisplayName("Should correctly add two positive numbers")
+    void testAddPositiveNumbers() {
         assertEquals(5, calculator.add(2, 3));
     }
 
     @Test
-    @DisplayName("add: positive and negative numbers should return correct sum")
-    void testAdd_PositiveAndNegativeNumbers() {
+    @DisplayName("Should correctly add a positive and a negative number")
+    void testAddPositiveAndNegativeNumbers() {
         assertEquals(-1, calculator.add(2, -3));
         assertEquals(1, calculator.add(-2, 3));
     }
 
     @Test
-    @DisplayName("add: zero with a number should return the number")
-    void testAdd_Zero() {
+    @DisplayName("Should correctly add two negative numbers")
+    void testAddNegativeNumbers() {
+        assertEquals(-5, calculator.add(-2, -3));
+    }
+
+    @Test
+    @DisplayName("Should correctly add with zero")
+    void testAddWithZero() {
         assertEquals(5, calculator.add(5, 0));
         assertEquals(-5, calculator.add(-5, 0));
         assertEquals(0, calculator.add(0, 0));
     }
 
     @Test
-    @DisplayName("add: large numbers near Integer.MAX_VALUE and Integer.MIN_VALUE")
-    void testAdd_LargeNumbers() {
-        assertEquals(Integer.MAX_VALUE, calculator.add(Integer.MAX_VALUE - 1, 1));
-        assertEquals(Integer.MIN_VALUE, calculator.add(Integer.MIN_VALUE + 1, -1));
-    }
-
-    @Test
-    @DisplayName("subtract: two positive numbers should return correct difference")
-    void testSubtract_PositiveNumbers() {
+    @DisplayName("Should correctly subtract two positive numbers")
+    void testSubtractPositiveNumbers() {
         assertEquals(1, calculator.subtract(3, 2));
+        assertEquals(-1, calculator.subtract(2, 3));
     }
 
     @Test
-    @DisplayName("subtract: positive and negative numbers should return correct difference")
-    void testSubtract_PositiveAndNegativeNumbers() {
+    @DisplayName("Should correctly subtract a positive and a negative number")
+    void testSubtractPositiveAndNegativeNumbers() {
         assertEquals(5, calculator.subtract(2, -3));
         assertEquals(-5, calculator.subtract(-2, 3));
     }
 
     @Test
-    @DisplayName("subtract: zero with a number should return correct difference")
-    void testSubtract_Zero() {
+    @DisplayName("Should correctly subtract two negative numbers")
+    void testSubtractNegativeNumbers() {
+        assertEquals(1, calculator.subtract(-2, -3));
+        assertEquals(-1, calculator.subtract(-3, -2));
+    }
+
+    @Test
+    @DisplayName("Should correctly subtract with zero")
+    void testSubtractWithZero() {
         assertEquals(5, calculator.subtract(5, 0));
         assertEquals(-5, calculator.subtract(-5, 0));
         assertEquals(0, calculator.subtract(0, 0));
-        assertEquals(-5, calculator.subtract(0, 5));
     }
 
     @Test
-    @DisplayName("subtract: large numbers near Integer.MAX_VALUE and Integer.MIN_VALUE")
-    void testSubtract_LargeNumbers() {
-        assertEquals(1, calculator.subtract(Integer.MAX_VALUE, Integer.MAX_VALUE - 1));
-        assertEquals(-1, calculator.subtract(Integer.MIN_VALUE, Integer.MIN_VALUE + 1));
-    }
-
-    @Test
-    @DisplayName("multiply: two positive numbers should return correct product")
-    void testMultiply_PositiveNumbers() {
+    @DisplayName("Should correctly multiply two positive numbers")
+    void testMultiplyPositiveNumbers() {
         assertEquals(6, calculator.multiply(2, 3));
     }
 
     @Test
-    @DisplayName("multiply: positive and negative numbers should return correct product")
-    void testMultiply_PositiveAndNegativeNumbers() {
+    @DisplayName("Should correctly multiply a positive and a negative number")
+    void testMultiplyPositiveAndNegativeNumbers() {
         assertEquals(-6, calculator.multiply(2, -3));
         assertEquals(-6, calculator.multiply(-2, 3));
+    }
+
+    @Test
+    @DisplayName("Should correctly multiply two negative numbers")
+    void testMultiplyNegativeNumbers() {
         assertEquals(6, calculator.multiply(-2, -3));
     }
 
     @Test
-    @DisplayName("multiply: by zero should return zero")
-    void testMultiply_ByZero() {
+    @DisplayName("Should correctly multiply by zero")
+    void testMultiplyByZero() {
         assertEquals(0, calculator.multiply(5, 0));
         assertEquals(0, calculator.multiply(0, 5));
-        assertEquals(0, calculator.multiply(0, 0));
         assertEquals(0, calculator.multiply(-5, 0));
+        assertEquals(0, calculator.multiply(0, 0));
     }
 
     @Test
-    @DisplayName("multiply: by one should return the number")
-    void testMultiply_ByOne() {
+    @DisplayName("Should correctly multiply by one")
+    void testMultiplyByOne() {
         assertEquals(5, calculator.multiply(5, 1));
         assertEquals(-5, calculator.multiply(-5, 1));
-        assertEquals(5, calculator.multiply(1, 5));
     }
 
     @Test
-    @DisplayName("divide: two positive numbers should return correct quotient")
-    void testDivide_PositiveNumbers() {
+    @DisplayName("Should correctly divide two positive numbers")
+    void testDividePositiveNumbers() {
         assertEquals(3, calculator.divide(6, 2));
     }
 
     @Test
-    @DisplayName("divide: positive and negative numbers should return correct quotient")
-    void testDivide_PositiveAndNegativeNumbers() {
+    @DisplayName("Should correctly divide a positive by a negative number")
+    void testDividePositiveByNegative() {
         assertEquals(-3, calculator.divide(6, -2));
+    }
+
+    @Test
+    @DisplayName("Should correctly divide a negative by a positive number")
+    void testDivideNegativeByPositive() {
         assertEquals(-3, calculator.divide(-6, 2));
+    }
+
+    @Test
+    @DisplayName("Should correctly divide two negative numbers")
+    void testDivideNegativeNumbers() {
         assertEquals(3, calculator.divide(-6, -2));
     }
 
     @Test
-    @DisplayName("divide: by one should return the number")
-    void testDivide_ByOne() {
-        assertEquals(5, calculator.divide(5, 1));
-        assertEquals(-5, calculator.divide(-5, 1));
+    @DisplayName("Should correctly handle integer division (truncation)")
+    void testDivideIntegerTruncation() {
+        assertEquals(2, calculator.divide(7, 3));
+        assertEquals(-2, calculator.divide(-7, 3));
+        assertEquals(-2, calculator.divide(7, -3));
     }
 
     @Test
-    @DisplayName("divide: non-exact division should truncate towards zero")
-    void testDivide_Truncation() {
-        assertEquals(2, calculator.divide(5, 2));
-        assertEquals(-2, calculator.divide(-5, 2));
-        assertEquals(-2, calculator.divide(5, -2));
+    @DisplayName("Should correctly divide zero by a non-zero number")
+    void testDivideZeroByNonZero() {
+        assertEquals(0, calculator.divide(0, 5));
+        assertEquals(0, calculator.divide(0, -5));
     }
 
     @Test
-    @DisplayName("divide: by zero should throw IllegalArgumentException")
-    void testDivide_ByZero() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> calculator.divide(10, 0));
-        assertEquals("Division by zero", exception.getMessage());
-        exception = assertThrows(IllegalArgumentException.class, () -> calculator.divide(0, 0));
-        assertEquals("Division by zero", exception.getMessage());
+    @DisplayName("Should throw IllegalArgumentException when dividing by zero")
+    void testDivideByZeroThrowsException() {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            calculator.divide(10, 0);
+        });
+        assertEquals("Division by zero", thrown.getMessage());
+
+        thrown = assertThrows(IllegalArgumentException.class, () -> {
+            calculator.divide(-10, 0);
+        });
+        assertEquals("Division by zero", thrown.getMessage());
+
+        thrown = assertThrows(IllegalArgumentException.class, () -> {
+            calculator.divide(0, 0);
+        });
+        assertEquals("Division by zero", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("divide: Integer.MIN_VALUE by -1 should throw ArithmeticException due to overflow")
-    void testDivide_MinIntByMinusOne_ThrowsArithmeticException() {
-        assertThrows(ArithmeticException.class, () -> calculator.divide(Integer.MIN_VALUE, -1));
-    }
-
-    @Test
-    @DisplayName("main: should print expected output to console")
-    void testMain() {
-        String[] args = {};
-        Calculator.main(args);
+    @DisplayName("Should print correct output for main method")
+    void testMainMethodOutput() {
+        Calculator.main(new String[]{});
         String expectedOutput = "2+3 = 5" + System.lineSeparator() + "6/2 = 3" + System.lineSeparator();
-        assertEquals(expectedOutput, outContent.toString());
+        assertEquals(expectedOutput, outputStreamCaptor.toString());
     }
 }

@@ -2,41 +2,42 @@ package org.example;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MainTest {
 
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
-    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     @BeforeEach
-    public void setUp() {
-        System.setOut(new PrintStream(outputStreamCaptor, true, StandardCharsets.UTF_8));
+    public void setUpStreams() {
+        System.setOut(new PrintStream(outContent));
     }
 
     @AfterEach
-    public void tearDown() {
+    public void restoreStreams() {
         System.setOut(originalOut);
     }
 
     @Test
-    @DisplayName("Should print greeting and loop messages to console")
-    void main_ShouldPrintExpectedOutput() {
-        // Given
-        String[] args = {}; // main method expects a String array for arguments
+    void testMainMethodPrintsExpectedOutput() {
+        // The main method does not use its arguments, so passing null is acceptable.
+        Main.main(null);
 
-        // When
-        Main.main(args);
+        // Construct the expected output string precisely based on the Main class's behavior.
+        // printf does not add a newline, while println does.
+        String expectedOutput = "Hello and welcome!" +
+                                "i = 1" + System.lineSeparator() +
+                                "i = 2" + System.lineSeparator() +
+                                "i = 3" + System.lineSeparator() +
+                                "i = 4" + System.lineSeparator() +
+                                "i = 5" + System.lineSeparator();
 
-        // Then
-        String expectedOutput = "Hello and welcome!i = 1\ni = 2\ni = 3\ni = 4\ni = 5\n";
-        assertEquals(expectedOutput, outputStreamCaptor.toString(StandardCharsets.UTF_8));
+        // Assert that the captured standard output matches the expected string.
+        assertEquals(expectedOutput, outContent.toString(), "The output of the main method did not match expectations.");
     }
 }
