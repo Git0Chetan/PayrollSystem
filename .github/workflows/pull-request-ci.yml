@@ -40,47 +40,54 @@ jobs:
         if: always()
         run: |
           # Guard against missing jacoco data
-          if [ ! -f target/site/jacoco/jacoco.csv ]; then
-            echo "Jacoco CSV not found; skipping coverage gate."
+          XML_REPORT="target/site/jacoco/jacoco.xml"
+          if [ ! -f "$XML_REPORT" ]; then
+            echo "Jacoco XML report not found; skipping coverage gate."
             exit 0
           fi
 
-          # Basic gate logic (adjust as needed)
-          COVERAGE_MINIMUM=80
-          TOTAL_INSTRUCTIONS=$(awk -F',' 'NR==1{print $4+$5}' target/site/jacoco/jacoco.csv 2>/dev/null || echo 0)
-          COVERAGE_PERCENTAGE=0
-          if [ "$TOTAL_INSTRUCTIONS" -gt 0 ]; then
-            INSTRUCTION_COVERED=$(awk -F',' 'NR==1{print $5}' target/site/jacoco/jacoco.csv 2>/dev/null || echo 0)
-            COVERAGE_PERCENTAGE=$(awk "BEGIN {printf \"%.0f\", (100 * ${INSTRUCTION_COVERED})/(${TOTAL_INSTRUCTIONS})}")
+          # Parse Jacoco XML for INSTRUCTION counter
+          COVERED=$(grep -Eo 'counter type="INSTRUCTION"[^>]*covered="[^"]+"' "$XML_REPORT" | head -n1 | sed 's/.*covered="\([^"]*\)".*/\1/')
+          MISSED=$(grep -Eo 'counter type="INSTRUCTION"[^>]*missed="[^"]+"' "$XML_REPORT" | head -n1 | sed 's/.*missed="\([^"]*\)".*/\1/')
+          COVERED=${COVERED:-0}
+          MISSED=${MISSED:-0}
+          TOTAL=$((COVERED + MISSED))
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "No coverage data found in Jacoco report; skipping gate."
+            exit 0
           fi
-          echo "Total Coverage: ${COVERAGE_PERCENTAGE}%"
+          COVERAGE_PERCENT=$((100 * COVERED / TOTAL))
+
+          COVERAGE_MINIMUM=80
+          echo "Total Coverage: ${COVERAGE_PERCENT}%"
           echo "Required Minimum: ${COVERAGE_MINIMUM}%"
-          if (( COVERAGE_PERCENTAGE < COVERAGE_MINIMUM )); then
+
+          if (( COVERAGE_PERCENT < COVERAGE_MINIMUM )); then
             echo "Warning: Code coverage is below the ${COVERAGE_MINIMUM}% threshold."
-            # Do not fail the job; just emit a warning
+            # Do not fail the job; just a warning
           fi
 
       - name: Summarize test results
         if: always()
         shell: bash
         run: |
-          # Robust summarize: avoid -u to prevent unbound var errors
+          # Robust summarize: avoid strict -u to prevent unbound var errors
           set -e
           REPORT_DIR="target/surefire-reports"
 
-          if compgen -G "$REPORT_DIR/TEST-*.xml" > /dev/null; then
-            TOTAL=0
-            FAILURES=0
-            ERRORS=0
-            SKIPPED=0
-            FAILED_TESTS=()
+          TOTAL=0
+          FAILURES=0
+          ERRORS=0
+          SKIPPED=0
+          FAILED_TESTS=()
 
+          if [ -d "$REPORT_DIR" ]; then
             for file in "$REPORT_DIR"/TEST-*.xml; do
               if [ -f "$file" ]; then
-                t=$(grep -oE 'tests="[0-9]+"' "$file" | head -n1 | cut -d'="' -f2 | tr -d '"')
-                f=$(grep -oE 'failures="[0-9]+"' "$file" | head -n1 | cut -d'="' -f2 | tr -d '"')
-                e=$(grep -oE 'errors="[0-9]+"' "$file" | head -n1 | cut -d'="' -f2 | tr -d '"')
-                s=$(grep -oE 'skipped="[0-9]+"' "$file" | head -n1 | cut -d'="' -f2 | tr -d '"')
+                t=$(grep -o 'tests="[^"]*"' "$file" | cut -d'"' -f2)
+                f=$(grep -o 'failures="[^"]*"' "$file" | cut -d'"' -f2)
+                e=$(grep -o 'errors="[^"]*"' "$file" | cut -d'"' -f2)
+                s=$(grep -o 'skipped="[^"]*"' "$file" | cut -d'"' -f2)
 
                 t=${t:-0}; f=${f:-0}; e=${e:-0}; s=${s:-0}
                 TOTAL=$((TOTAL + t))
@@ -88,34 +95,30 @@ jobs:
                 ERRORS=$((ERRORS + e))
                 SKIPPED=$((SKIPPED + s))
 
-                # Collect failed test names
-                while IFS= read -r line; do
-                  if echo "$line" | grep -q '<testcase'; then
-                    NAME=$(echo "$line" | grep -oE 'name="[^"]+"' | cut -d'"' -f2)
-                    # If this testcase has a failure or error, record it
-                    if grep -q '<failure>' "$file" || grep -q '<error>' "$file"; then
-                      if [ -n "$NAME" ]; then
-                        FAILED_TESTS+=("$NAME")
-                      fi
+                # If there are failures in this XML, collect test names
+                if grep -q '<failure>' "$file" || grep -q '<error>' "$file"; then
+                  test_names=$(grep -o 'name="[^"]*"' "$file" | cut -d'"' -f2)
+                  for nm in $test_names; do
+                    if [ -n "$nm" ]; then
+                      FAILED_TESTS+=("$nm")
                     fi
-                  fi
-                done < "$file"
+                  done
+                fi
               fi
             done
-
-            PASSED=$((TOTAL - FAILURES - ERRORS - SKIPPED))
-
-            echo "[INFO] Tests run: ${TOTAL}, Failures: ${FAILURES}, Errors: ${ERRORS}, Skipped: ${SKIPPED}, Time elapsed: N/A"
-            if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
-              printf "FAILED TESTS: "
-              printf "%s," "${FAILED_TESTS[@]}"
-              echo
-            fi
-
-            FAILED_LIST=$(printf "%s," "${FAILED_TESTS[@]}")
-            FAILED_LIST=${FAILED_LIST%,}
-            echo "failed_tests=${FAILED_LIST}" >> "$GITHUB_OUTPUT"
           else
-            echo "[INFO] No Surefire reports found. Tests may not have run."
-            echo "failed_tests=" >> "$GITHUB_OUTPUT"
+            echo "No Surefire reports found (directory missing)."
           fi
+
+          PASSED=$((TOTAL - FAILURES - ERRORS - SKIPPED))
+
+          echo "[INFO] Tests run: ${TOTAL}, Failures: ${FAILURES}, Errors: ${ERRORS}, Skipped: ${SKIPPED}, Time elapsed: N/A"
+          if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
+            printf "FAILED TESTS: "
+            printf "%s," "${FAILED_TESTS[@]}"
+            echo
+          fi
+
+          FAILED_LIST=$(printf "%s," "${FAILED_TESTS[@]}")
+          FAILED_LIST=${FAILED_LIST%,}
+          echo "failed_tests=${FAILED_LIST}" >> "$GITHUB_OUTPUT"
