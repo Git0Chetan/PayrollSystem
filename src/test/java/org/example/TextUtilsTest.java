@@ -178,7 +178,7 @@ class TextUtilsTest {
     @Test
     @DisplayName("countVowels: Should ignore special characters and numbers when counting vowels")
     void testCountVowels_WithSpecialCharsAndNumbers() {
-        assertEquals(2, TextUtils.countVowels("h3ll0 w0rld!"), "String 'h3ll0 w0rld!' should have 2 vowels.");
+        assertEquals(2, TextUtils.countVowels("h3llo world!"), "String 'h3ll0 w0rld!' should have 2 vowels.");
     }
 
     // Test cases for the toUpperCase method
@@ -274,6 +274,6 @@ class TextUtilsTest {
     @DisplayName("removeVowels: Should ignore special characters and numbers when removing vowels")
     void testRemoveVowels_WithSpecialCharsAndNumbers() {
         assertEquals("h3ll0 w0rld!", TextUtils.removeVowels("h3ll0 w0rld!"), "Numbers and special characters should be preserved.");
-        assertEquals("Tst Strng Wth N Vwls @nd Numbrs 123", TextUtils.removeVowels("Test String With No Vowels @and Numbers 123"), "Should remove vowels from a complex string.");
+        assertEquals("Tst Strng Wth N Vwls @nd Nmbrs 123", TextUtils.removeVowels("Test String With No Vowels @and Numbers 123"), "Should remove vowels from a complex string.");
     }
 }
