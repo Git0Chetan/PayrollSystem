@@ -4,335 +4,311 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("NumberUtils Test Suite")
 class NumberUtilsTest {
 
     // Test cases for factorial method
 
-    // Test case for factorial of 0
+    // Test case for factorial of zero
     @Test
     @DisplayName("factorial(0) should return 1")
-    void testFactorial_Zero() {
-        assertEquals(1L, NumberUtils.factorial(0));
+    void factorial_zero_returnsOne() {
+        assertEquals(1, NumberUtils.factorial(0));
     }
 
-    // Test case for factorial of 1
+    // Test case for factorial of one
     @Test
     @DisplayName("factorial(1) should return 1")
-    void testFactorial_One() {
-        assertEquals(1L, NumberUtils.factorial(1));
+    void factorial_one_returnsOne() {
+        assertEquals(1, NumberUtils.factorial(1));
     }
 
-    // Test case for factorial of a small positive number
+    // Test case for factorial of a positive number
     @Test
     @DisplayName("factorial(5) should return 120")
-    void testFactorial_PositiveSmallNumber() {
-        assertEquals(120L, NumberUtils.factorial(5));
+    void factorial_positiveNumber_returnsCorrectResult() {
+        assertEquals(120, NumberUtils.factorial(5));
     }
 
     // Test case for factorial of a larger positive number
     @Test
     @DisplayName("factorial(10) should return 3628800")
-    void testFactorial_PositiveLargerNumber() {
+    void factorial_largerPositiveNumber_returnsCorrectResult() {
         assertEquals(3628800L, NumberUtils.factorial(10));
     }
 
-    // Test case for factorial of an edge positive number (max for int that fits long)
+    // Test case for factorial of 20, which is the largest factorial that fits into long
     @Test
-    @DisplayName("factorial(20) should return 2432902008176640000L")
-    void testFactorial_MaxIntFitsLong() {
+    @DisplayName("factorial(20) should return 2432902008176640000")
+    void factorial_maxLongValue_returnsCorrectResult() {
         assertEquals(2432902008176640000L, NumberUtils.factorial(20));
     }
 
-    // Test case for negative input to factorial (should throw IllegalArgumentException)
+    // Test case for factorial of a negative number
     @Test
     @DisplayName("factorial(-1) should throw IllegalArgumentException")
-    void testFactorial_NegativeNumber_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> NumberUtils.factorial(-1),
-                "n must be non-negative");
+    void factorial_negativeNumber_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> NumberUtils.factorial(-1));
     }
 
     // Test cases for isPrime method
 
-    // Test case for 0 (not prime)
-    @Test
-    @DisplayName("isPrime(0) should return false")
-    void testIsPrime_Zero() {
-        assertFalse(NumberUtils.isPrime(0));
-    }
-
-    // Test case for 1 (not prime)
+    // Test case for number 1, which is not prime
     @Test
     @DisplayName("isPrime(1) should return false")
-    void testIsPrime_One() {
+    void isPrime_one_returnsFalse() {
         assertFalse(NumberUtils.isPrime(1));
     }
 
-    // Test case for 2 (smallest prime)
+    // Test case for number 2, which is prime
     @Test
     @DisplayName("isPrime(2) should return true")
-    void testIsPrime_Two() {
+    void isPrime_two_returnsTrue() {
         assertTrue(NumberUtils.isPrime(2));
     }
 
-    // Test case for 3 (prime)
+    // Test case for number 3, which is prime
     @Test
     @DisplayName("isPrime(3) should return true")
-    void testIsPrime_Three() {
+    void isPrime_three_returnsTrue() {
         assertTrue(NumberUtils.isPrime(3));
     }
 
-    // Test case for 4 (not prime)
+    // Test case for an even number greater than 2, which is not prime
     @Test
     @DisplayName("isPrime(4) should return false")
-    void testIsPrime_Four() {
+    void isPrime_evenNumber_returnsFalse() {
         assertFalse(NumberUtils.isPrime(4));
     }
 
-    // Test case for a small prime number
+    // Test case for a prime number
     @Test
     @DisplayName("isPrime(7) should return true")
-    void testIsPrime_SmallPrime() {
+    void isPrime_primeNumber_returnsTrue() {
         assertTrue(NumberUtils.isPrime(7));
     }
 
-    // Test case for a small composite number
+    // Test case for a composite number (multiple of 3)
     @Test
     @DisplayName("isPrime(9) should return false")
-    void testIsPrime_SmallComposite() {
+    void isPrime_compositeNumberMultipleOfThree_returnsFalse() {
         assertFalse(NumberUtils.isPrime(9));
+    }
+
+    // Test case for a composite number using i*i check (e.g., 25)
+    @Test
+    @DisplayName("isPrime(25) should return false")
+    void isPrime_compositeNumberSquare_returnsFalse() {
+        assertFalse(NumberUtils.isPrime(25));
     }
 
     // Test case for a larger prime number
     @Test
-    @DisplayName("isPrime(17) should return true")
-    void testIsPrime_LargerPrime() {
-        assertTrue(NumberUtils.isPrime(17));
+    @DisplayName("isPrime(47) should return true")
+    void isPrime_largerPrimeNumber_returnsTrue() {
+        assertTrue(NumberUtils.isPrime(47));
     }
 
     // Test case for a larger composite number
     @Test
-    @DisplayName("isPrime(25) should return false")
-    void testIsPrime_LargerComposite() {
-        assertFalse(NumberUtils.isPrime(25));
-    }
-
-    // Test case for a prime number that is a multiple of 5 + 2
-    @Test
-    @DisplayName("isPrime(23) should return true")
-    void testIsPrime_AnotherPrime() {
-        assertTrue(NumberUtils.isPrime(23));
-    }
-
-    // Test case for a number that fails prime check due to factor i+2
-    @Test
     @DisplayName("isPrime(49) should return false")
-    void testIsPrime_CompositeFromIPlusTwoFactor() {
-        assertFalse(NumberUtils.isPrime(49)); // 49 = 7 * 7
+    void isPrime_largerCompositeNumber_returnsFalse() {
+        assertFalse(NumberUtils.isPrime(49));
     }
 
-    // Test case for a larger prime using the loop optimization
+    // Test case for a negative number
     @Test
-    @DisplayName("isPrime(97) should return true")
-    void testIsPrime_LargePrimeOptimizedLoop() {
-        assertTrue(NumberUtils.isPrime(97));
+    @DisplayName("isPrime(-5) should return false")
+    void isPrime_negativeNumber_returnsFalse() {
+        assertFalse(NumberUtils.isPrime(-5));
     }
 
-    // Test case for a larger composite using the loop optimization
+    // Test case for 0
     @Test
-    @DisplayName("isPrime(121) should return false")
-    void testIsPrime_LargeCompositeOptimizedLoop() {
-        assertFalse(NumberUtils.isPrime(121)); // 11 * 11
+    @DisplayName("isPrime(0) should return false")
+    void isPrime_zero_returnsFalse() {
+        assertFalse(NumberUtils.isPrime(0));
     }
-
 
     // Test cases for gcd method
 
-    // Test case for two positive numbers
+    // Test case for positive numbers
     @Test
     @DisplayName("gcd(48, 18) should return 6")
-    void testGcd_TwoPositiveNumbers() {
+    void gcd_positiveNumbers_returnsCorrectResult() {
         assertEquals(6, NumberUtils.gcd(48, 18));
     }
 
-    // Test case where one number is a multiple of the other
+    // Test case for one number being zero
     @Test
-    @DisplayName("gcd(10, 5) should return 5")
-    void testGcd_OneMultipleOfOther() {
-        assertEquals(5, NumberUtils.gcd(10, 5));
+    @DisplayName("gcd(10, 0) should return 10")
+    void gcd_oneNumberZero_returnsOtherNumber() {
+        assertEquals(10, NumberUtils.gcd(10, 0));
     }
 
-    // Test case where numbers are coprime
+    // Test case for the other number being zero
     @Test
-    @DisplayName("gcd(7, 13) should return 1")
-    void testGcd_CoprimeNumbers() {
-        assertEquals(1, NumberUtils.gcd(7, 13));
+    @DisplayName("gcd(0, 15) should return 15")
+    void gcd_otherNumberZero_returnsFirstNumber() {
+        assertEquals(15, NumberUtils.gcd(0, 15));
     }
 
-    // Test case with one number as zero
-    @Test
-    @DisplayName("gcd(0, 5) should return 5")
-    void testGcd_OneZero() {
-        assertEquals(5, NumberUtils.gcd(0, 5));
-    }
-
-    // Test case with the other number as zero
-    @Test
-    @DisplayName("gcd(7, 0) should return 7")
-    void testGcd_OtherZero() {
-        assertEquals(7, NumberUtils.gcd(7, 0));
-    }
-
-    // Test case with both numbers as zero (edge case, GCD is typically undefined, but Euclidean algo returns 0)
-    // The implementation returns 0 for gcd(0,0) based on Euclidean algorithm for non-negative integers
+    // Test case for both numbers being zero
     @Test
     @DisplayName("gcd(0, 0) should return 0")
-    void testGcd_BothZero() {
+    void gcd_bothNumbersZero_returnsZero() {
         assertEquals(0, NumberUtils.gcd(0, 0));
     }
 
-    // Test case with negative numbers (implementation takes absolute values)
+    // Test case for negative numbers
+    @Test
+    @DisplayName("gcd(-48, -18) should return 6")
+    void gcd_negativeNumbers_returnsPositiveResult() {
+        assertEquals(6, NumberUtils.gcd(-48, -18));
+    }
+
+    // Test case for mixed positive and negative numbers
     @Test
     @DisplayName("gcd(-48, 18) should return 6")
-    void testGcd_NegativeAndPositive() {
+    void gcd_mixedSignNumbers_returnsPositiveResult() {
         assertEquals(6, NumberUtils.gcd(-48, 18));
     }
 
-    // Test case with both negative numbers
+    // Test case for coprime numbers
     @Test
-    @DisplayName("gcd(-18, -48) should return 6")
-    void testGcd_BothNegative() {
-        assertEquals(6, NumberUtils.gcd(-18, -48));
+    @DisplayName("gcd(7, 11) should return 1")
+    void gcd_coprimeNumbers_returnsOne() {
+        assertEquals(1, NumberUtils.gcd(7, 11));
     }
 
-    // Test case with order swapped
+    // Test case for one number being a multiple of the other
     @Test
-    @DisplayName("gcd(18, 48) should return 6")
-    void testGcd_OrderSwapped() {
-        assertEquals(6, NumberUtils.gcd(18, 48));
+    @DisplayName("gcd(20, 5) should return 5")
+    void gcd_oneNumberMultipleOfTheOther_returnsSmallerNumber() {
+        assertEquals(5, NumberUtils.gcd(20, 5));
     }
 
     // Test cases for lcm method
 
-    // Test case for two positive numbers
+    // Test case for positive numbers
     @Test
     @DisplayName("lcm(4, 6) should return 12")
-    void testLcm_TwoPositiveNumbers() {
+    void lcm_positiveNumbers_returnsCorrectResult() {
         assertEquals(12L, NumberUtils.lcm(4, 6));
     }
 
-    // Test case where numbers are coprime
+    // Test case for one number being zero
     @Test
-    @DisplayName("lcm(7, 13) should return 91")
-    void testLcm_CoprimeNumbers() {
-        assertEquals(91L, NumberUtils.lcm(7, 13));
+    @DisplayName("lcm(10, 0) should return 0")
+    void lcm_oneNumberZero_returnsZero() {
+        assertEquals(0L, NumberUtils.lcm(10, 0));
     }
 
-    // Test case where one number is a multiple of the other
-    @Test
-    @DisplayName("lcm(10, 5) should return 10")
-    void testLcm_OneMultipleOfOther() {
-        assertEquals(10L, NumberUtils.lcm(10, 5));
-    }
-
-    // Test case with one number as zero
-    @Test
-    @DisplayName("lcm(0, 5) should return 0")
-    void testLcm_OneZero() {
-        assertEquals(0L, NumberUtils.lcm(0, 5));
-    }
-
-    // Test case with the other number as zero
-    @Test
-    @DisplayName("lcm(7, 0) should return 0")
-    void testLcm_OtherZero() {
-        assertEquals(0L, NumberUtils.lcm(7, 0));
-    }
-
-    // Test case with both numbers as zero
+    // Test case for both numbers being zero
     @Test
     @DisplayName("lcm(0, 0) should return 0")
-    void testLcm_BothZero() {
+    void lcm_bothNumbersZero_returnsZero() {
         assertEquals(0L, NumberUtils.lcm(0, 0));
     }
 
-    // Test case with negative numbers (implementation takes absolute values)
-    @Test
-    @DisplayName("lcm(-4, 6) should return 12")
-    void testLcm_NegativeAndPositive() {
-        assertEquals(12L, NumberUtils.lcm(-4, 6));
-    }
-
-    // Test case with both negative numbers
+    // Test case for negative numbers
     @Test
     @DisplayName("lcm(-4, -6) should return 12")
-    void testLcm_BothNegative() {
+    void lcm_negativeNumbers_returnsPositiveResult() {
         assertEquals(12L, NumberUtils.lcm(-4, -6));
     }
 
-    // Test case with larger numbers to ensure long return type handles it
-//    @Test
-//    @DisplayName("lcm(2000000000, 3000000000) should return 6000000000L")
-//    void testLcm_LargeNumbers() {
-//        // gcd(2*10^9, 3*10^9) = 10^9
-//        // lcm = (2*10^9 * 3*10^9) / 10^9 = 6 * 10^9
-//        assertEquals(6000000000L, NumberUtils.lcm(2000000000, 3000000000));
-//    }
+    // Test case for mixed positive and negative numbers
+    @Test
+    @DisplayName("lcm(-4, 6) should return 12")
+    void lcm_mixedSignNumbers_returnsPositiveResult() {
+        assertEquals(12L, NumberUtils.lcm(-4, 6));
+    }
+
+    // Test case for coprime numbers
+    @Test
+    @DisplayName("lcm(7, 11) should return 77")
+    void lcm_coprimeNumbers_returnsProduct() {
+        assertEquals(77L, NumberUtils.lcm(7, 11));
+    }
+
+    // Test case for one number being a multiple of the other
+    @Test
+    @DisplayName("lcm(20, 5) should return 20")
+    void lcm_oneNumberMultipleOfTheOther_returnsLargerNumber() {
+        assertEquals(20L, NumberUtils.lcm(20, 5));
+    }
+
+    // Test case for large numbers that fit in long
+    @Test
+    @DisplayName("lcm(2000000000, 1500000000) should return 6000000000L")
+    void lcm_largeNumbers_returnsCorrectResult() {
+        assertEquals(6000000000L, NumberUtils.lcm(2000000000, 1500000000));
+    }
 
     // Test cases for sum method
 
-    // Test case for an array with positive numbers
+    // Test case for an array of positive numbers
     @Test
-    @DisplayName("sum([1, 2, 3, 4, 5]) should return 15")
-    void testSum_PositiveNumbers() {
+    @DisplayName("sum({1, 2, 3, 4, 5}) should return 15")
+    void sum_positiveNumbersArray_returnsCorrectSum() {
         int[] arr = {1, 2, 3, 4, 5};
         assertEquals(15, NumberUtils.sum(arr));
     }
 
-    // Test case for an array with negative numbers
+    // Test case for an array of negative numbers
     @Test
-    @DisplayName("sum([-1, -2, -3]) should return -6")
-    void testSum_NegativeNumbers() {
+    @DisplayName("sum({-1, -2, -3}) should return -6")
+    void sum_negativeNumbersArray_returnsCorrectSum() {
         int[] arr = {-1, -2, -3};
         assertEquals(-6, NumberUtils.sum(arr));
     }
 
-    // Test case for an array with mixed positive and negative numbers
+    // Test case for an array of mixed positive, negative, and zero numbers
     @Test
-    @DisplayName("sum([-1, 0, 10, -5, 2]) should return 6")
-    void testSum_MixedNumbers() {
-        int[] arr = {-1, 0, 10, -5, 2};
-        assertEquals(6, NumberUtils.sum(arr));
-    }
-
-    // Test case for an array containing only zero
-    @Test
-    @DisplayName("sum([0, 0, 0]) should return 0")
-    void testSum_OnlyZeros() {
-        int[] arr = {0, 0, 0};
-        assertEquals(0, NumberUtils.sum(arr));
+    @DisplayName("sum({1, -2, 3, 0, -5}) should return -3")
+    void sum_mixedNumbersArray_returnsCorrectSum() {
+        int[] arr = {1, -2, 3, 0, -5};
+        assertEquals(-3, NumberUtils.sum(arr));
     }
 
     // Test case for an empty array
     @Test
-    @DisplayName("sum([]) should return 0")
-    void testSum_EmptyArray() {
+    @DisplayName("sum({}) should return 0")
+    void sum_emptyArray_returnsZero() {
         int[] arr = {};
         assertEquals(0, NumberUtils.sum(arr));
     }
 
-    // Test case for a null array input
+    // Test case for a null array
     @Test
     @DisplayName("sum(null) should return 0")
-    void testSum_NullArray() {
-        assertEquals(0, NumberUtils.sum(null));
+    void sum_nullArray_returnsZero() {
+        int[] arr = null;
+        assertEquals(0, NumberUtils.sum(arr));
     }
 
     // Test case for an array with a single element
     @Test
-    @DisplayName("sum([42]) should return 42")
-    void testSum_SingleElementArray() {
-        int[] arr = {42};
-        assertEquals(42, NumberUtils.sum(arr));
+    @DisplayName("sum({7}) should return 7")
+    void sum_singleElementArray_returnsElementValue() {
+        int[] arr = {7};
+        assertEquals(7, NumberUtils.sum(arr));
+    }
+
+    // Test case for an array with all zeros
+    @Test
+    @DisplayName("sum({0, 0, 0}) should return 0")
+    void sum_allZerosArray_returnsZero() {
+        int[] arr = {0, 0, 0};
+        assertEquals(0, NumberUtils.sum(arr));
+    }
+
+    // Test case for array with large sum
+    @Test
+    @DisplayName("sum({Integer.MAX_VALUE, 1}) should handle overflow and return expected sum in Java's int arithmetic")
+    void sum_largeNumbers_returnsCorrectSum() {
+        // In Java, int overflow wraps around.
+        int[] arr = {Integer.MAX_VALUE, 1};
+        assertEquals(Integer.MIN_VALUE, NumberUtils.sum(arr));
     }
 }
