@@ -270,14 +270,6 @@ class NumberUtilsTest {
         assertEquals(12L, NumberUtils.lcm(-4, -6));
     }
 
-    // Test case with larger numbers to ensure long return type handles it
-//    @Test
-//    @DisplayName("lcm(2000000000, 3000000000) should return 6000000000L")
-//    void testLcm_LargeNumbers() {
-//        // gcd(2*10^9, 3*10^9) = 10^9
-//        // lcm = (2*10^9 * 3*10^9) / 10^9 = 6 * 10^9
-//        assertEquals(6000000000L, NumberUtils.lcm(2000000000, 3000000000));
-//    }
 
     // Test cases for sum method
 
