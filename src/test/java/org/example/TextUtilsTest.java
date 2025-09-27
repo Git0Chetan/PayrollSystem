@@ -1,279 +1,267 @@
 package org.example;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TextUtilsTest {
 
-    // Test cases for the reverse method
+    // Test cases for reverse method
 
     // Test case for null input
     @Test
-    @DisplayName("reverse: Should return null for null input")
     void testReverse_NullInput() {
-        assertNull(TextUtils.reverse(null), "Null input should result in null output.");
+        assertNull(TextUtils.reverse(null), "Should return null for null input");
     }
 
     // Test case for an empty string
     @Test
-    @DisplayName("reverse: Should return an empty string for empty input")
     void testReverse_EmptyString() {
-        assertEquals("", TextUtils.reverse(""), "Empty string should remain empty.");
+        assertEquals("", TextUtils.reverse(""), "Should return an empty string for empty input");
     }
 
     // Test case for a single character string
     @Test
-    @DisplayName("reverse: Should return the same character for a single character string")
-    void testReverse_SingleCharString() {
-        assertEquals("a", TextUtils.reverse("a"), "Single character string should remain unchanged.");
+    void testReverse_SingleCharacterString() {
+        assertEquals("a", TextUtils.reverse("a"), "Should return the same character for single character input");
     }
 
-    // Test case for a common word
+    // Test case for a simple even-length string
     @Test
-    @DisplayName("reverse: Should correctly reverse a typical word")
-    void testReverse_TypicalWord() {
-        assertEquals("olleh", TextUtils.reverse("hello"), "Should reverse 'hello' to 'olleh'.");
+    void testReverse_EvenLengthString() {
+        assertEquals("dcba", TextUtils.reverse("abcd"), "Should correctly reverse an even-length string");
     }
 
-    // Test case for a palindrome string
+    // Test case for a simple odd-length string
     @Test
-    @DisplayName("reverse: Should correctly reverse a palindrome string")
-    void testReverse_PalindromeString() {
-        assertEquals("racecar", TextUtils.reverse("racecar"), "Should reverse 'racecar' to 'racecar'.");
+    void testReverse_OddLengthString() {
+        assertEquals("edcba", TextUtils.reverse("abcde"), "Should correctly reverse an odd-length string");
     }
 
-    // Test case for a string with spaces and special characters
+    // Test case for a string with spaces
     @Test
-    @DisplayName("reverse: Should correctly reverse a string with spaces and special characters")
-    void testReverse_WithSpacesAndSpecialChars() {
-        assertEquals("!dlroW olleH", TextUtils.reverse("Hello World!"), "Should handle spaces and special characters.");
+    void testReverse_StringWithSpaces() {
+        assertEquals("dlrow olleh", TextUtils.reverse("hello world"), "Should reverse string including spaces");
     }
 
-    // Test cases for the isPalindrome method
+    // Test case for a string with special characters
+    @Test
+    void testReverse_StringWithSpecialCharacters() {
+        assertEquals("!@#$", TextUtils.reverse("$#@!"), "Should reverse string including special characters");
+    }
+
+    // Test case for a long string
+    @Test
+    void testReverse_LongString() {
+        String longString = "This is a relatively long string to test the reverse method.";
+        String reversedLongString = ".dohtem esrever eht tset ot gnirts gnol ylevitaler a si sihT";
+        assertEquals(reversedLongString, TextUtils.reverse(longString), "Should correctly reverse a long string");
+    }
+
+    // Test cases for isPalindrome method
 
     // Test case for null input
     @Test
-    @DisplayName("isPalindrome: Should return false for null input")
     void testIsPalindrome_NullInput() {
-        assertFalse(TextUtils.isPalindrome(null), "Null input should not be considered a palindrome.");
+        assertFalse(TextUtils.isPalindrome(null), "Should return false for null input");
     }
 
     // Test case for an empty string
     @Test
-    @DisplayName("isPalindrome: Should return true for an empty string")
     void testIsPalindrome_EmptyString() {
-        assertTrue(TextUtils.isPalindrome(""), "Empty string should be considered a palindrome.");
+        assertTrue(TextUtils.isPalindrome(""), "Should consider an empty string as a palindrome");
     }
 
     // Test case for a single character string
     @Test
-    @DisplayName("isPalindrome: Should return true for a single character string")
-    void testIsPalindrome_SingleCharString() {
-        assertTrue(TextUtils.isPalindrome("a"), "Single character string should be a palindrome.");
+    void testIsPalindrome_SingleCharacter() {
+        assertTrue(TextUtils.isPalindrome("a"), "Should consider a single character string as a palindrome");
     }
 
-    // Test case for a known palindrome
+    // Test case for an even-length palindrome
     @Test
-    @DisplayName("isPalindrome: Should return true for a classic palindrome (e.g., racecar)")
-    void testIsPalindrome_TruePalindrome() {
-        assertTrue(TextUtils.isPalindrome("racecar"), "Racecar should be a palindrome.");
+    void testIsPalindrome_EvenLengthPalindrome() {
+        assertTrue(TextUtils.isPalindrome("abba"), "Should identify 'abba' as a palindrome");
     }
 
-    // Test case for a non-palindrome
+    // Test case for an odd-length palindrome
     @Test
-    @DisplayName("isPalindrome: Should return false for a non-palindrome (e.g., hello)")
+    void testIsPalindrome_OddLengthPalindrome() {
+        assertTrue(TextUtils.isPalindrome("madam"), "Should identify 'madam' as a palindrome");
+    }
+
+    // Test case for a non-palindrome string
+    @Test
     void testIsPalindrome_NonPalindrome() {
-        assertFalse(TextUtils.isPalindrome("hello"), "Hello should not be a palindrome.");
+        assertFalse(TextUtils.isPalindrome("hello"), "Should identify 'hello' as a non-palindrome");
     }
 
-    // Test case for palindrome with mixed case
+    // Test case for a palindrome with mixed case, spaces, and punctuation
     @Test
-    @DisplayName("isPalindrome: Should handle mixed case palindromes correctly")
-    void testIsPalindrome_MixedCasePalindrome() {
-        assertTrue(TextUtils.isPalindrome("Racecar"), "Racecar (mixed case) should be a palindrome.");
+    void testIsPalindrome_ComplexPalindrome() {
+        assertTrue(TextUtils.isPalindrome("A man, a plan, a canal: Panama"), "Should handle complex palindromes ignoring case and non-alphanumeric chars");
     }
 
-    // Test case for palindrome with spaces and punctuation
+    // Test case for a non-palindrome with mixed case, spaces, and punctuation
     @Test
-    @DisplayName("isPalindrome: Should ignore spaces and punctuation for palindromes")
-    void testIsPalindrome_WithSpacesAndPunctuation() {
-        assertTrue(TextUtils.isPalindrome("A man, a plan, a canal: Panama"), "Complex palindrome should be recognized.");
+    void testIsPalindrome_ComplexNonPalindrome() {
+        assertFalse(TextUtils.isPalindrome("Hello, World!"), "Should correctly identify a complex non-palindrome");
     }
 
-    // Test case for a non-palindrome with spaces and punctuation
+    // Test case for a palindrome with numbers
     @Test
-    @DisplayName("isPalindrome: Should return false for a non-palindrome with spaces and punctuation")
-    void testIsPalindrome_NonPalindromeWithSpacesAndPunctuation() {
-        assertFalse(TextUtils.isPalindrome("Hello, World!"), "Non-palindrome with special chars should be recognized as such.");
-    }
-
-    // Test case for a numeric palindrome
-    @Test
-    @DisplayName("isPalindrome: Should recognize numeric palindromes")
     void testIsPalindrome_NumericPalindrome() {
-        assertTrue(TextUtils.isPalindrome("12321"), "Numeric string 12321 should be a palindrome.");
+        assertTrue(TextUtils.isPalindrome("12321"), "Should handle numeric palindromes");
     }
 
-    // Test case for an alphanumeric palindrome
+    // Test case for a palindrome with only non-alphanumeric characters (should become empty)
     @Test
-    @DisplayName("isPalindrome: Should recognize alphanumeric palindromes")
-    void testIsPalindrome_AlphanumericPalindrome() {
-        assertTrue(TextUtils.isPalindrome("Madam, I'm Adam"), "Alphanumeric palindrome should be recognized.");
+    void testIsPalindrome_OnlySpecialCharacters() {
+        assertTrue(TextUtils.isPalindrome("!@#$%^&*"), "Should be true if only special characters are present (cleaned string is empty)");
     }
 
-    // Test cases for the countVowels method
+    // Test cases for countVowels method
 
     // Test case for null input
     @Test
-    @DisplayName("countVowels: Should return 0 for null input")
     void testCountVowels_NullInput() {
-        assertEquals(0, TextUtils.countVowels(null), "Null input should result in 0 vowels.");
+        assertEquals(0, TextUtils.countVowels(null), "Should return 0 for null input");
     }
 
     // Test case for an empty string
     @Test
-    @DisplayName("countVowels: Should return 0 for an empty string")
     void testCountVowels_EmptyString() {
-        assertEquals(0, TextUtils.countVowels(""), "Empty string should have 0 vowels.");
+        assertEquals(0, TextUtils.countVowels(""), "Should return 0 for an empty string");
     }
 
     // Test case for a string with no vowels
     @Test
-    @DisplayName("countVowels: Should return 0 for a string with no vowels")
     void testCountVowels_NoVowels() {
-        assertEquals(0, TextUtils.countVowels("rhythm"), "String 'rhythm' should have 0 vowels.");
-        assertEquals(0, TextUtils.countVowels("bcdfghjkl"), "String with only consonants should have 0 vowels.");
+        assertEquals(0, TextUtils.countVowels("rhythm"), "Should return 0 for a string with no vowels");
     }
 
-    // Test case for a string with all lowercase vowels
+    // Test case for a string with only lowercase vowels
     @Test
-    @DisplayName("countVowels: Should correctly count all lowercase vowels")
-    void testCountVowels_AllLowercaseVowels() {
-        assertEquals(5, TextUtils.countVowels("aeiou"), "String 'aeiou' should have 5 vowels.");
+    void testCountVowels_OnlyLowercaseVowels() {
+        assertEquals(5, TextUtils.countVowels("aeiou"), "Should count all lowercase vowels");
     }
 
-    // Test case for a string with all uppercase vowels
+    // Test case for a string with only uppercase vowels
     @Test
-    @DisplayName("countVowels: Should correctly count all uppercase vowels")
-    void testCountVowels_AllUppercaseVowels() {
-        assertEquals(5, TextUtils.countVowels("AEIOU"), "String 'AEIOU' should have 5 vowels.");
+    void testCountVowels_OnlyUppercaseVowels() {
+        assertEquals(5, TextUtils.countVowels("AEIOU"), "Should count all uppercase vowels");
     }
 
-    // Test case for a string with mixed case vowels and consonants
+    // Test case for a string with mixed case vowels
     @Test
-    @DisplayName("countVowels: Should correctly count mixed case vowels in a typical sentence")
-    void testCountVowels_MixedCaseSentence() {
-        assertEquals(4, TextUtils.countVowels("Java is fun"), "String 'Java is fun' should have 4 vowels.");
+    void testCountVowels_MixedCaseVowels() {
+        assertEquals(5, TextUtils.countVowels("AeiOu"), "Should count mixed case vowels");
     }
 
-    // Test case for a string with repeated vowels
+    // Test case for a string with mixed vowels and consonants
     @Test
-    @DisplayName("countVowels: Should count repeated vowels")
-    void testCountVowels_RepeatedVowels() {
-        assertEquals(3, TextUtils.countVowels("banana"), "String 'banana' should have 3 vowels.");
+    void testCountVowels_MixedVowelsAndConsonants() {
+        assertEquals(3, TextUtils.countVowels("Hello World"), "Should count vowels in a mixed string (e, o, o)");
     }
 
     // Test case for a string with special characters and numbers
     @Test
-    @DisplayName("countVowels: Should ignore special characters and numbers when counting vowels")
     void testCountVowels_WithSpecialCharsAndNumbers() {
-        assertEquals(2, TextUtils.countVowels("h3llo world!"), "String 'h3ll0 w0rld!' should have 2 vowels.");
+        assertEquals(5, TextUtils.countVowels("a!e@i#o$u123"), "Should count vowels ignoring special characters and numbers");
     }
 
-    // Test cases for the toUpperCase method
+    // Test case for a sentence
+    @Test
+    void testCountVowels_Sentence() {
+        // The quick brown fox jumps over the lazy dog.
+        // e, ui, o, o, u, o, e, e, a, o
+        assertEquals(12, TextUtils.countVowels("The quick brown fox jumps over the lazy dog."), "Should count vowels in a sentence");
+    }
+
+    // Test cases for toUpperCase method
 
     // Test case for null input
     @Test
-    @DisplayName("toUpperCase: Should return null for null input")
     void testToUpperCase_NullInput() {
-        assertNull(TextUtils.toUpperCase(null), "Null input should result in null output.");
+        assertNull(TextUtils.toUpperCase(null), "Should return null for null input");
     }
 
     // Test case for an empty string
     @Test
-    @DisplayName("toUpperCase: Should return an empty string for empty input")
     void testToUpperCase_EmptyString() {
-        assertEquals("", TextUtils.toUpperCase(""), "Empty string should remain empty.");
+        assertEquals("", TextUtils.toUpperCase(""), "Should return an empty string for empty input");
     }
 
     // Test case for an all lowercase string
     @Test
-    @DisplayName("toUpperCase: Should convert an all lowercase string to uppercase")
     void testToUpperCase_AllLowercase() {
-        assertEquals("HELLO", TextUtils.toUpperCase("hello"), "Should convert 'hello' to 'HELLO'.");
+        assertEquals("HELLO", TextUtils.toUpperCase("hello"), "Should convert all lowercase to uppercase");
     }
 
     // Test case for an all uppercase string
     @Test
-    @DisplayName("toUpperCase: Should return an all uppercase string unchanged")
     void testToUpperCase_AllUppercase() {
-        assertEquals("WORLD", TextUtils.toUpperCase("WORLD"), "All uppercase string should remain unchanged.");
+        assertEquals("HELLO", TextUtils.toUpperCase("HELLO"), "Should return the same string if already uppercase");
     }
 
     // Test case for a mixed case string
     @Test
-    @DisplayName("toUpperCase: Should convert a mixed case string to all uppercase")
     void testToUpperCase_MixedCase() {
-        assertEquals("HELLO WORLD", TextUtils.toUpperCase("HeLlO WoRlD"), "Should convert 'HeLlO WoRlD' to 'HELLO WORLD'.");
+        assertEquals("HELLO WORLD", TextUtils.toUpperCase("Hello World"), "Should convert mixed case to all uppercase");
     }
 
     // Test case for a string with numbers and special characters
     @Test
-    @DisplayName("toUpperCase: Should not alter numbers or special characters")
     void testToUpperCase_WithNumbersAndSpecialChars() {
-        assertEquals("123!@# ABC", TextUtils.toUpperCase("123!@# Abc"), "Numbers and special characters should not change.");
+        assertEquals("123!@#ABC", TextUtils.toUpperCase("123!@#abc"), "Should not change numbers or special characters, only letters");
     }
 
-    // Test cases for the removeVowels method
+    // Test cases for removeVowels method
 
     // Test case for null input
     @Test
-    @DisplayName("removeVowels: Should return null for null input")
     void testRemoveVowels_NullInput() {
-        assertNull(TextUtils.removeVowels(null), "Null input should result in null output.");
+        assertNull(TextUtils.removeVowels(null), "Should return null for null input");
     }
 
     // Test case for an empty string
     @Test
-    @DisplayName("removeVowels: Should return an empty string for empty input")
     void testRemoveVowels_EmptyString() {
-        assertEquals("", TextUtils.removeVowels(""), "Empty string should remain empty.");
+        assertEquals("", TextUtils.removeVowels(""), "Should return an empty string for empty input");
     }
 
-    // Test case for a string with all vowels
+    // Test case for a string with only vowels
     @Test
-    @DisplayName("removeVowels: Should remove all vowels from a string consisting only of vowels")
-    void testRemoveVowels_AllVowels() {
-        assertEquals("", TextUtils.removeVowels("AEIOUaeiou"), "String with all vowels should become empty.");
+    void testRemoveVowels_OnlyVowels() {
+        assertEquals("", TextUtils.removeVowels("aeiouAEIOU"), "Should return an empty string if all characters are vowels");
     }
 
     // Test case for a string with no vowels
     @Test
-    @DisplayName("removeVowels: Should return the same string for input with no vowels")
     void testRemoveVowels_NoVowels() {
-        assertEquals("rhythm", TextUtils.removeVowels("rhythm"), "String 'rhythm' should remain unchanged.");
+        assertEquals("rhythm", TextUtils.removeVowels("rhythm"), "Should return the same string if it contains no vowels");
     }
 
-    // Test case for a common word
+    // Test case for a string with mixed vowels and consonants
     @Test
-    @DisplayName("removeVowels: Should correctly remove vowels from a typical word")
-    void testRemoveVowels_TypicalWord() {
-        assertEquals("hll", TextUtils.removeVowels("hello"), "Should remove vowels from 'hello' to get 'hll'.");
+    void testRemoveVowels_MixedVowelsAndConsonants() {
+        assertEquals("Hll Wrld", TextUtils.removeVowels("Hello World"), "Should remove all vowels from a mixed string");
     }
 
-    // Test case for a sentence with mixed case vowels
+    // Test case for a string with leading/trailing vowels
     @Test
-    @DisplayName("removeVowels: Should remove both lowercase and uppercase vowels from a sentence")
-    void testRemoveVowels_MixedCaseSentence() {
-        assertEquals("Jv s fn", TextUtils.removeVowels("Java is fun"), "Should remove vowels from 'Java is fun'.");
+    void testRemoveVowels_LeadingTrailingVowels() {
+        assertEquals("ppl", TextUtils.removeVowels("apple"), "Should remove leading/trailing vowels");
     }
 
     // Test case for a string with special characters and numbers
     @Test
-    @DisplayName("removeVowels: Should ignore special characters and numbers when removing vowels")
     void testRemoveVowels_WithSpecialCharsAndNumbers() {
-        assertEquals("h3ll0 w0rld!", TextUtils.removeVowels("h3ll0 w0rld!"), "Numbers and special characters should be preserved.");
-        assertEquals("Tst Strng Wth N Vwls @nd Nmbrs 123", TextUtils.removeVowels("Test String With No Vowels @and Numbers 123"), "Should remove vowels from a complex string.");
+        assertEquals("!@#$", TextUtils.removeVowels("a!e@i#o$u"), "Should remove vowels while keeping special characters and numbers");
+    }
+
+    // Test case for a sentence
+    @Test
+    void testRemoveVowels_Sentence() {
+        assertEquals("Th qck brwn fx jmps vr th lzy dg.", TextUtils.removeVowels("The quick brown fox jumps over the lazy dog."), "Should correctly remove vowels from a sentence");
     }
 }
