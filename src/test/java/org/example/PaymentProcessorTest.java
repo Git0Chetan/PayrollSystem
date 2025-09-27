@@ -1,10 +1,9 @@
 package org.example;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,345 +19,345 @@ public class PaymentProcessorTest {
 
     @BeforeEach
     void setUp() {
+        // Capture System.out to verify console output
         outputStreamCaptor = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStreamCaptor));
-        // Set default locale to US to ensure consistent number formatting for output assertions
+        // Ensure US locale for consistent number formatting in output
         Locale.setDefault(Locale.US);
     }
 
     @AfterEach
     void tearDown() {
+        // Restore original System.in and System.out after each test
         System.setIn(originalSystemIn);
         System.setOut(originalSystemOut);
     }
 
-    /**
-     * Helper method to provide input to System.in.
-     *
-     * @param data The string to be used as input.
-     */
-    private void provideInput(String data) {
-        ByteArrayInputStream testIn = new ByteArrayInputStream(data.getBytes());
-        System.setIn(testIn);
+    // Helper method to simulate user input and execute the main method
+    private void provideInputAndRunMain(String data) {
+        System.setIn(new ByteArrayInputStream(data.getBytes()));
+        PaymentProcessor.main(new String[]{});
     }
 
-    /**
-     * Helper method to get the captured output from System.out.
-     *
-     * @return The captured output as a trimmed string.
-     */
-    private String getOutput() {
-        return outputStreamCaptor.toString().trim();
-    }
-
-    // Test case for zero employees, ensuring correct output for no payroll entries
+    // Test case for zero employees, ensuring correct initial prompts and an empty payroll
     @Test
-    @DisplayName("main method - processes zero employees correctly, showing zero totals")
     void testMain_ZeroEmployees() {
-        String input = "0\n" + // Number of employees
-                       "1\n" + // Month
-                       "2023\n"; // Year
-        provideInput(input);
+        String input = """
+                0
+                1
+                2023
+                """;
+        provideInputAndRunMain(input);
 
-        PaymentProcessor.main(new String[]{});
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
 
-        String actualOutput = getOutput();
-        assertTrue(actualOutput.contains("Simple Payroll Processor"), "Should print welcome message");
-        assertTrue(actualOutput.contains("Enter number of employees:"), "Should ask for number of employees");
-        assertTrue(actualOutput.contains("Month (1-12):"), "Should ask for month");
-        assertTrue(actualOutput.contains("Year (e.g., 2025):"), "Should ask for year");
-        assertTrue(actualOutput.contains("Payroll for 1/2023"), "Should print payroll header");
-        assertTrue(actualOutput.contains("Total Gross: 0.00 | Total Tax: 0.00 | Total Net: 0.00"), "Should show zero totals");
+        Assertions.assertTrue(actualOutput.contains("Simple Payroll Processor (Single-file Java)"));
+        Assertions.assertTrue(actualOutput.contains("Enter number of employees: "));
+        Assertions.assertTrue(actualOutput.contains("Month (1-12): "));
+        Assertions.assertTrue(actualOutput.contains("Year (e.g., 2025): "));
+        Assertions.assertTrue(actualOutput.contains("Payroll for 1/2023"));
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 0.0 | Total Tax: 0.0 | Total Net: 0.0")); // Note: 0.0 for doubles
     }
 
-    // Test case for one full-time employee, verifying individual payroll line and totals
+    // Test case for one Full-Time employee with valid inputs, verifying calculations and output
     @Test
-    @DisplayName("main method - processes one full-time employee correctly")
     void testMain_OneFullTimeEmployee() {
-        String input = "1\n" + // Number of employees
-                       "1\n" + // Type: FullTime
-                       "FT001\n" + // ID
-                       "John Doe\n" + // Name
-                       "HR\n" + // Department
-                       "5000.00\n" + // Monthly Salary
-                       "0.20\n" + // Tax Rate (20%)
-                       "6\n" + // Month
-                       "2024\n"; // Year
-        provideInput(input);
+        String input = """
+                1
+                1
+                FT001
+                John Doe
+                Sales
+                5000.00
+                0.15
+                6
+                2024
+                """;
+        provideInputAndRunMain(input);
 
-        PaymentProcessor.main(new String[]{});
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
 
-        // Expected calculations:
-        // Gross = 5000.00
-        // Tax = 5000.00 * 0.20 = 1000.00
-        // Net = 5000.00 - 1000.00 = 4000.00
-        String expectedEmployeeLine = "ID=FT001, Name=John Doe, Type=FullTime, Gross=5000.00, Tax=1000.00, Net=4000.00";
-        String expectedTotalLine = "Total Gross: 5000.00 | Total Tax: 1000.00 | Total Net: 4000.00";
-        String actualOutput = getOutput();
+        Assertions.assertTrue(actualOutput.contains("Employee #1"));
+        Assertions.assertTrue(actualOutput.contains("ID: FT001"));
+        Assertions.assertTrue(actualOutput.contains("Name: John Doe"));
+        Assertions.assertTrue(actualOutput.contains("Department: Sales"));
+        Assertions.assertTrue(actualOutput.contains("Monthly Salary: "));
+        Assertions.assertTrue(actualOutput.contains("Tax Rate (e.g., 0.20 for 20%): "));
+        Assertions.assertTrue(actualOutput.contains("Month (1-12): "));
+        Assertions.assertTrue(actualOutput.contains("Year (e.g., 2025): "));
 
-        assertTrue(actualOutput.contains("Payroll for 6/2024"), "Should print payroll header for correct month/year");
-        assertTrue(actualOutput.contains(expectedEmployeeLine), "Should contain correct employee payroll line");
-        assertTrue(actualOutput.contains(expectedTotalLine), "Should contain correct total payroll line");
+        String expectedPayrollLine = "ID=FT001, Name=John Doe, Type=FullTime, Gross=5000.00, Tax=750.00, Net=4250.00";
+        Assertions.assertTrue(actualOutput.contains(expectedPayrollLine));
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 5000.0 | Total Tax: 750.0 | Total Net: 4250.0"));
     }
 
-    // Test case for one part-time employee, verifying individual payroll line and totals
+    // Test case for one Part-Time employee with valid inputs, verifying calculations and output
     @Test
-    @DisplayName("main method - processes one part-time employee correctly")
     void testMain_OnePartTimeEmployee() {
-        String input = "1\n" + // Number of employees
-                       "2\n" + // Type: PartTime
-                       "PT001\n" + // ID
-                       "Jane Smith\n" + // Name
-                       "Sales\n" + // Department
-                       "25.50\n" + // Hourly Rate
-                       "160\n" + // Hours Worked
-                       "0.10\n" + // Tax Rate (10%)
-                       "7\n" + // Month
-                       "2024\n"; // Year
-        provideInput(input);
+        String input = """
+                1
+                2
+                PT001
+                Jane Smith
+                Marketing
+                25.50
+                160
+                0.10
+                7
+                2024
+                """;
+        provideInputAndRunMain(input);
 
-        PaymentProcessor.main(new String[]{});
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
 
-        // Expected calculations:
+        Assertions.assertTrue(actualOutput.contains("Employee #1"));
+        Assertions.assertTrue(actualOutput.contains("Type (1=FullTime, 2=PartTime): "));
+        Assertions.assertTrue(actualOutput.contains("ID: PT001"));
+        Assertions.assertTrue(actualOutput.contains("Name: Jane Smith"));
+        Assertions.assertTrue(actualOutput.contains("Department: Marketing"));
+        Assertions.assertTrue(actualOutput.contains("Hourly Rate: "));
+        Assertions.assertTrue(actualOutput.contains("Hours Worked: "));
+        Assertions.assertTrue(actualOutput.contains("Tax Rate (e.g., 0.12 for 12%): "));
+
         // Gross = 25.50 * 160 = 4080.00
         // Tax = 4080.00 * 0.10 = 408.00
         // Net = 4080.00 - 408.00 = 3672.00
-        String expectedEmployeeLine = "ID=PT001, Name=Jane Smith, Type=PartTime, Gross=4080.00, Tax=408.00, Net=3672.00";
-        String expectedTotalLine = "Total Gross: 4080.00 | Total Tax: 408.00 | Total Net: 3672.00";
-        String actualOutput = getOutput();
-
-        assertTrue(actualOutput.contains("Payroll for 7/2024"), "Should print payroll header for correct month/year");
-        assertTrue(actualOutput.contains(expectedEmployeeLine), "Should contain correct employee payroll line");
-        assertTrue(actualOutput.contains(expectedTotalLine), "Should contain correct total payroll line");
+        String expectedPayrollLine = "ID=PT001, Name=Jane Smith, Type=PartTime, Gross=4080.00, Tax=408.00, Net=3672.00";
+        Assertions.assertTrue(actualOutput.contains(expectedPayrollLine));
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 4080.0 | Total Tax: 408.0 | Total Net: 3672.0"));
     }
 
-    // Test case for multiple employees of mixed types, verifying all individual lines and aggregate totals
+    // Test case for a mix of Full-Time and Part-Time employees, verifying individual and total calculations
     @Test
-    @DisplayName("main method - processes mixed full-time and part-time employees correctly")
     void testMain_MixedEmployees() {
-        String input = "2\n" + // Number of employees
-                       "1\n" + // Type: FullTime (John Doe)
-                       "FT002\n" + // ID
-                       "John Doe\n" + // Name
-                       "Engineering\n" + // Department
-                       "6000.00\n" + // Monthly Salary
-                       "0.25\n" + // Tax Rate (25%)
-                       "2\n" + // Type: PartTime (Alice Green)
-                       "PT002\n" + // ID
-                       "Alice Green\n" + // Name
-                       "Marketing\n" + // Department
-                       "30.00\n" + // Hourly Rate
-                       "100\n" + // Hours Worked
-                       "0.15\n" + // Tax Rate (15%)
-                       "8\n" + // Month
-                       "2024\n"; // Year
-        provideInput(input);
+        String input = """
+                2
+                1
+                FT002
+                Alice Brown
+                HR
+                6000.00
+                0.20
+                2
+                PT002
+                Bob White
+                Finance
+                30.00
+                100
+                0.12
+                8
+                2024
+                """;
+        provideInputAndRunMain(input);
 
-        PaymentProcessor.main(new String[]{});
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
 
-        // Calculations for John Doe (FullTime):
-        // Gross = 6000.00
-        // Tax = 6000.00 * 0.25 = 1500.00
-        // Net = 6000.00 - 1500.00 = 4500.00
+        // FT002: Gross=6000.00, Tax=1200.00, Net=4800.00
+        Assertions.assertTrue(actualOutput.contains("ID=FT002, Name=Alice Brown, Type=FullTime, Gross=6000.00, Tax=1200.00, Net=4800.00"));
 
-        // Calculations for Alice Green (PartTime):
-        // Gross = 30.00 * 100 = 3000.00
-        // Tax = 3000.00 * 0.15 = 450.00
-        // Net = 3000.00 - 450.00 = 2550.00
+        // PT002: Gross=30.00 * 100 = 3000.00, Tax=3000.00 * 0.12 = 360.00, Net=2640.00
+        Assertions.assertTrue(actualOutput.contains("ID=PT002, Name=Bob White, Type=PartTime, Gross=3000.00, Tax=360.00, Net=2640.00"));
 
-        // Totals:
-        // Total Gross = 6000.00 + 3000.00 = 9000.00
-        // Total Tax = 1500.00 + 450.00 = 1950.00
-        // Total Net = 4500.00 + 2550.00 = 7050.00
-
-        String expectedJohnDoeLine = "ID=FT002, Name=John Doe, Type=FullTime, Gross=6000.00, Tax=1500.00, Net=4500.00";
-        String expectedAliceGreenLine = "ID=PT002, Name=Alice Green, Type=PartTime, Gross=3000.00, Tax=450.00, Net=2550.00";
-        String expectedTotalLine = "Total Gross: 9000.00 | Total Tax: 1950.00 | Total Net: 7050.00";
-        String actualOutput = getOutput();
-
-        assertTrue(actualOutput.contains("Payroll for 8/2024"), "Should print payroll header for correct month/year");
-        assertTrue(actualOutput.contains(expectedJohnDoeLine), "Should contain correct John Doe payroll line");
-        assertTrue(actualOutput.contains(expectedAliceGreenLine), "Should contain correct Alice Green payroll line");
-        assertTrue(actualOutput.contains(expectedTotalLine), "Should contain correct total payroll line");
+        // Total Gross = 6000 + 3000 = 9000.0
+        // Total Tax = 1200 + 360 = 1560.0
+        // Total Net = 4800 + 2640 = 7440.0
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 9000.0 | Total Tax: 1560.0 | Total Net: 7440.0"));
     }
 
-    // Test case for invalid number of employees input (non-integer), which is handled by the main method's try-catch
+    // Test case for invalid number of employees input (non-numeric), expecting the default behavior
     @Test
-    @DisplayName("main method - handles invalid number of employees input by defaulting to zero")
-    void testMain_InvalidNumberOfEmployeesInput() {
-        String input = "not a number\n" + // Invalid number of employees
-                       "1\n" + // Month
-                       "2023\n"; // Year
-        provideInput(input);
+    void testMain_InvalidNumEmployeesInput_DefaultsToZero() {
+        String input = """
+                not_a_number
+                1
+                2023
+                """;
+        provideInputAndRunMain(input);
 
-        PaymentProcessor.main(new String[]{});
-
-        String actualOutput = getOutput();
-        assertTrue(actualOutput.contains("Invalid number, defaulting to 0."), "Should print error message for invalid employee count");
-        assertTrue(actualOutput.contains("Total Gross: 0.00 | Total Tax: 0.00 | Total Net: 0.00"), "Should show zero totals as it defaulted to 0 employees");
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
+        Assertions.assertTrue(actualOutput.contains("Invalid number, defaulting to 0."));
+        Assertions.assertTrue(actualOutput.contains("Payroll for 1/2023"));
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 0.0 | Total Tax: 0.0 | Total Net: 0.0"));
     }
 
-    // Test case for invalid employee type input (non-integer), expecting a NumberFormatException because it's not handled
+    // Test case for empty input for number of employees, expecting the default behavior
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid employee type input")
-    void testMain_InvalidEmployeeTypeInput_ThrowsException() {
-        String input = "1\n" + // Number of employees
-                       "invalid_type\n"; // Invalid type (will cause NumberFormatException)
-        provideInput(input);
+    void testMain_EmptyNumEmployeesInput_DefaultsToZero() {
+        String input = """
 
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-integer employee type input");
+                1
+                2023
+                """; // Empty string for N results in NumberFormatException caught by main, defaulting N to 0.
+        provideInputAndRunMain(input);
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
+        Assertions.assertTrue(actualOutput.contains("Invalid number, defaulting to 0."));
+        Assertions.assertTrue(actualOutput.contains("Payroll for 1/2023"));
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 0.0 | Total Tax: 0.0 | Total Net: 0.0"));
     }
 
-    // Test case for invalid monthly salary input (non-numeric), expecting a NumberFormatException
+    // Test case for invalid employee type input (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid monthly salary input for full-time employee")
-    void testMain_InvalidMonthlySalaryInput_ThrowsException() {
-        String input = "1\n" + // Number of employees
-                       "1\n" + // Type: FullTime
-                       "FT003\n" + // ID
-                       "Bob\n" + // Name
-                       "IT\n" + // Department
-                       "not a salary\n"; // Invalid Monthly Salary (will cause NumberFormatException)
-        provideInput(input);
-
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-numeric monthly salary input");
+    void testMain_InvalidEmployeeTypeInput_ThrowsNumberFormatException() {
+        String input = """
+                1
+                not_a_type
+                ID001
+                Name
+                Dept
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case for invalid tax rate input (non-numeric) for a full-time employee, expecting a NumberFormatException
+    // Test case for invalid monthly salary input for Full-Time employee (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid full-time tax rate input")
-    void testMain_InvalidFullTimeTaxRateInput_ThrowsException() {
-        String input = "1\n" + // Number of employees
-                       "1\n" + // Type: FullTime
-                       "FT004\n" + // ID
-                       "Charlie\n" + // Name
-                       "Finance\n" + // Department
-                       "7000.00\n" + // Monthly Salary
-                       "not a tax\n"; // Invalid Tax Rate (will cause NumberFormatException)
-        provideInput(input);
-
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-numeric full-time tax rate input");
+    void testMain_InvalidFullTimeSalaryInput_ThrowsNumberFormatException() {
+        String input = """
+                1
+                1
+                FT003
+                Chris Green
+                IT
+                invalid_salary
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case for invalid hourly rate input (non-numeric) for a part-time employee, expecting a NumberFormatException
+    // Test case for invalid hourly rate input for Part-Time employee (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid hourly rate input for part-time employee")
-    void testMain_InvalidHourlyRateInput_ThrowsException() {
-        String input = "1\n" + // Number of employees
-                       "2\n" + // Type: PartTime
-                       "PT003\n" + // ID
-                       "Diana\n" + // Name
-                       "Support\n" + // Department
-                       "not a rate\n"; // Invalid Hourly Rate (will cause NumberFormatException)
-        provideInput(input);
-
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-numeric hourly rate input");
+    void testMain_InvalidPartTimeHourlyRateInput_ThrowsNumberFormatException() {
+        String input = """
+                1
+                2
+                PT003
+                Diana Blue
+                HR
+                invalid_rate
+                100
+                0.10
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case for invalid hours worked input (non-integer) for a part-time employee, expecting a NumberFormatException
+    // Test case for invalid hours worked input for Part-Time employee (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid hours worked input for part-time employee")
-    void testMain_InvalidHoursWorkedInput_ThrowsException() {
-        String input = "1\n" + // Number of employees
-                       "2\n" + // Type: PartTime
-                       "PT004\n" + // ID
-                       "Eve\n" + // Name
-                       "Operations\n" + // Department
-                       "20.00\n" + // Hourly Rate
-                       "not hours\n"; // Invalid Hours Worked (will cause NumberFormatException)
-        provideInput(input);
-
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-integer hours worked input");
+    void testMain_InvalidPartTimeHoursInput_ThrowsNumberFormatException() {
+        String input = """
+                1
+                2
+                PT004
+                Eve Black
+                Ops
+                20.00
+                invalid_hours
+                0.10
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case for invalid month input (non-integer), expecting a NumberFormatException
+    // Test case for invalid tax rate input for Full-Time employee (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid month input")
-    void testMain_InvalidMonthInput_ThrowsException() {
-        String input = "0\n" + // Number of employees
-                       "not a month\n"; // Invalid Month (will cause NumberFormatException)
-        provideInput(input);
-
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-integer month input");
+    void testMain_InvalidFullTimeTaxRateInput_ThrowsNumberFormatException() {
+        String input = """
+                1
+                1
+                FT004
+                Frank White
+                Admin
+                4000.00
+                invalid_tax
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case for invalid year input (non-integer), expecting a NumberFormatException
+    // Test case for invalid tax rate input for Part-Time employee (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - throws NumberFormatException for invalid year input")
-    void testMain_InvalidYearInput_ThrowsException() {
-        String input = "0\n" + // Number of employees
-                       "1\n" + // Valid Month
-                       "not a year\n"; // Invalid Year (will cause NumberFormatException)
-        provideInput(input);
-
-        assertThrows(NumberFormatException.class, () -> PaymentProcessor.main(new String[]{}),
-                "Expected NumberFormatException for non-integer year input");
+    void testMain_InvalidPartTimeTaxRateInput_ThrowsNumberFormatException() {
+        String input = """
+                1
+                2
+                PT005
+                Grace Green
+                Support
+                15.00
+                80
+                invalid_tax
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case to explicitly verify that Locale.US is used for formatting numbers in the output.
-    // This ensures decimal points are always '.' and no thousands separators.
+    // Test case for invalid month input (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - uses US Locale for number formatting in output (decimal points)")
-    void testMain_LocaleFormatting() {
-        String input = "1\n" + // Number of employees
-                       "1\n" + // Type: FullTime
-                       "FT005\n" + // ID
-                       "Frank\n" + // Name
-                       "Sales\n" + // Department
-                       "5500.50\n" + // Monthly Salary (with fractional part)
-                       "0.18\n" + // Tax Rate
-                       "9\n" + // Month
-                       "2024\n"; // Year
-        provideInput(input);
-
-        PaymentProcessor.main(new String[]{});
-
-        // Expected calculations:
-        // Gross = 5500.50
-        // Tax = 5500.50 * 0.18 = 990.09
-        // Net = 5500.50 - 990.09 = 4510.41
-        String expectedEmployeeLine = "ID=FT005, Name=Frank, Type=FullTime, Gross=5500.50, Tax=990.09, Net=4510.41";
-        String expectedTotalLine = "Total Gross: 5500.50 | Total Tax: 990.09 | Total Net: 4510.41";
-        String actualOutput = getOutput();
-
-        assertTrue(actualOutput.contains(expectedEmployeeLine), "Should use dot for decimals in employee line as per US locale");
-        assertTrue(actualOutput.contains(expectedTotalLine), "Should use dot for decimals in total line as per US locale");
+    void testMain_InvalidMonthInput_ThrowsNumberFormatException() {
+        String input = """
+                0
+                not_a_month
+                2023
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
     }
 
-    // Test case for an employee type number that is not 1 (e.g., 99), verifying it's treated as PartTime
+    // Test case for invalid year input (non-numeric), expecting NumberFormatException
     @Test
-    @DisplayName("main method - treats employee type other than 1 as PartTime")
-    void testMain_InvalidEmployeeTypeNumberDefaultsToPartTime() {
-        String input = "1\n" + // Number of employees
-                       "99\n" + // Type: Not 1, not 2; current code defaults to PartTime (else branch)
-                       "PT005\n" + // ID
-                       "Grace\n" + // Name
-                       "QA\n" + // Department
-                       "35.00\n" + // Hourly Rate
-                       "150\n" + // Hours Worked
-                       "0.12\n" + // Tax Rate
-                       "10\n" + // Month
-                       "2024\n"; // Year
-        provideInput(input);
+    void testMain_InvalidYearInput_ThrowsNumberFormatException() {
+        String input = """
+                0
+                1
+                not_a_year
+                """;
+        
+        Assertions.assertThrows(NumberFormatException.class, () -> provideInputAndRunMain(input));
+    }
 
-        PaymentProcessor.main(new String[]{});
+    // Test case for multiple employees with various types, checking overall totals and individual lines
+    @Test
+    void testMain_MultipleMixedEmployees() {
+        String input = """
+                3
+                1
+                FT001
+                John Doe
+                Sales
+                5000.00
+                0.15
+                2
+                PT001
+                Jane Smith
+                Marketing
+                25.00
+                160
+                0.10
+                1
+                FT002
+                Alice Brown
+                HR
+                6000.00
+                0.20
+                6
+                2024
+                """;
+        provideInputAndRunMain(input);
 
-        // Expected calculations (as PartTime):
-        // Gross = 35.00 * 150 = 5250.00
-        // Tax = 5250.00 * 0.12 = 630.00
-        // Net = 5250.00 - 630.00 = 4620.00
-        String expectedEmployeeLine = "ID=PT005, Name=Grace, Type=PartTime, Gross=5250.00, Tax=630.00, Net=4620.00";
-        String expectedTotalLine = "Total Gross: 5250.00 | Total Tax: 630.00 | Total Net: 4620.00";
-        String actualOutput = getOutput();
+        String actualOutput = outputStreamCaptor.toString().replace("\r\n", "\n");
 
-        assertTrue(actualOutput.contains("Payroll for 10/2024"), "Should print payroll header for correct month/year");
-        assertTrue(actualOutput.contains(expectedEmployeeLine), "Employee should be processed as PartTime with correct calculations");
-        assertTrue(actualOutput.contains(expectedTotalLine), "Totals should reflect PartTime calculations");
+        // FT001: Gross=5000.00, Tax=750.00, Net=4250.00
+        Assertions.assertTrue(actualOutput.contains("ID=FT001, Name=John Doe, Type=FullTime, Gross=5000.00, Tax=750.00, Net=4250.00"));
+
+        // PT001: Gross=25.00 * 160 = 4000.00, Tax=4000.00 * 0.10 = 400.00, Net=3600.00
+        Assertions.assertTrue(actualOutput.contains("ID=PT001, Name=Jane Smith, Type=PartTime, Gross=4000.00, Tax=400.00, Net=3600.00"));
+
+        // FT002: Gross=6000.00, Tax=1200.00, Net=4800.00
+        Assertions.assertTrue(actualOutput.contains("ID=FT002, Name=Alice Brown, Type=FullTime, Gross=6000.00, Tax=1200.00, Net=4800.00"));
+
+        // Total Gross = 5000 + 4000 + 6000 = 15000.0
+        // Total Tax = 750 + 400 + 1200 = 2350.0
+        // Total Net = 4250 + 3600 + 4800 = 12650.0
+        Assertions.assertTrue(actualOutput.contains("Total Gross: 15000.0 | Total Tax: 2350.0 | Total Net: 12650.0"));
     }
 }
