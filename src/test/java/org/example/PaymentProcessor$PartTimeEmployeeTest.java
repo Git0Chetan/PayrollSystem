@@ -1,104 +1,139 @@
 package org.example;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentProcessor$PartTimeEmployeeTest {
 
-    private static final double DELTA = 0.001; // For double comparisons
+    private PaymentProcessor.PartTimeEmployee partTimeEmployee;
+    private static final double DELTA = 0.0001; // For double comparisons
 
-    // Test case for calculateGross with positive hourly rate and hours worked
-    @Test
-    void calculateGross_positiveValues_shouldReturnCorrectGross() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT001", "Jane Doe", "Sales", 20.0, 80, 0.10);
-        double expectedGross = 20.0 * 80; // 1600.0
-        assertEquals(expectedGross, employee.calculateGross(1, 2023), DELTA);
+    // Re-initialize for each test to ensure isolation
+    @BeforeEach
+    void setUp() {
+        // Default valid constructor parameters for an employee
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT001", "Jane Doe", "Sales", 25.0, 160, 0.15);
     }
 
-    // Test case for calculateGross with zero hourly rate
+    // Test case for valid positive hourly rate and hours worked
     @Test
-    void calculateGross_zeroHourlyRate_shouldReturnZero() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT002", "John Smith", "Marketing", 0.0, 100, 0.15);
+    @DisplayName("calculateGross: Should return correct gross for positive hourly rate and hours worked")
+    void calculateGross_PositiveValues_ReturnsCorrectGross() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT001", "Jane Doe", "Sales", 25.0, 160, 0.15);
+        double expectedGross = 25.0 * 160; // 4000.0
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(1, 2023), DELTA,
+                "Gross calculation should be correct for positive values.");
+    }
+
+    // Test case for zero hourly rate
+    @Test
+    @DisplayName("calculateGross: Should return zero gross for zero hourly rate")
+    void calculateGross_ZeroHourlyRate_ReturnsZero() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT002", "John Smith", "IT", 0.0, 100, 0.10);
         double expectedGross = 0.0 * 100; // 0.0
-        assertEquals(expectedGross, employee.calculateGross(2, 2023), DELTA);
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(2, 2023), DELTA,
+                "Gross calculation should be zero when hourly rate is zero.");
     }
 
-    // Test case for calculateGross with zero hours worked
+    // Test case for zero hours worked
     @Test
-    void calculateGross_zeroHoursWorked_shouldReturnZero() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT003", "Alice Brown", "HR", 25.0, 0, 0.05);
-        double expectedGross = 25.0 * 0; // 0.0
-        assertEquals(expectedGross, employee.calculateGross(3, 2023), DELTA);
+    @DisplayName("calculateGross: Should return zero gross for zero hours worked")
+    void calculateGross_ZeroHoursWorked_ReturnsZero() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT003", "Alice Johnson", "Marketing", 30.0, 0, 0.12);
+        double expectedGross = 30.0 * 0; // 0.0
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(3, 2023), DELTA,
+                "Gross calculation should be zero when hours worked is zero.");
     }
 
-    // Test case for calculateGross with both zero hourly rate and hours worked
+    // Test case for both zero hourly rate and hours worked
     @Test
-    void calculateGross_zeroHourlyRateAndHoursWorked_shouldReturnZero() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT004", "Bob White", "IT", 0.0, 0, 0.08);
+    @DisplayName("calculateGross: Should return zero gross for zero hourly rate and zero hours worked")
+    void calculateGross_ZeroHourlyRateAndHoursWorked_ReturnsZero() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT004", "Bob Brown", "HR", 0.0, 0, 0.05);
         double expectedGross = 0.0 * 0; // 0.0
-        assertEquals(expectedGross, employee.calculateGross(4, 2023), DELTA);
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(4, 2023), DELTA,
+                "Gross calculation should be zero when both hourly rate and hours worked are zero.");
     }
 
-    // Test case for calculateGross with a negative hourly rate (unusual, but current implementation allows)
+    // Test case for negative hourly rate (unlikely but possible via constructor)
     @Test
-    void calculateGross_negativeHourlyRate_shouldReturnNegativeGross() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT005", "Charlie Green", "Finance", -10.0, 50, 0.12);
+    @DisplayName("calculateGross: Should return negative gross for negative hourly rate")
+    void calculateGross_NegativeHourlyRate_ReturnsNegativeGross() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT005", "Charlie Green", "Operations", -10.0, 50, 0.10);
         double expectedGross = -10.0 * 50; // -500.0
-        assertEquals(expectedGross, employee.calculateGross(5, 2023), DELTA);
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(5, 2023), DELTA,
+                "Gross calculation should be negative if hourly rate is negative.");
     }
 
-    // Test case for calculateGross with negative hours worked (unusual, but current implementation allows)
+    // Test case for negative hours worked (unlikely but possible via constructor)
     @Test
-    void calculateGross_negativeHoursWorked_shouldReturnNegativeGross() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT006", "Diana Blue", "Operations", 30.0, -20, 0.18);
-        double expectedGross = 30.0 * -20; // -600.0
-        assertEquals(expectedGross, employee.calculateGross(6, 2023), DELTA);
+    @DisplayName("calculateGross: Should return negative gross for negative hours worked")
+    void calculateGross_NegativeHoursWorked_ReturnsNegativeGross() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT006", "David Blue", "Finance", 20.0, -10, 0.18);
+        double expectedGross = 20.0 * -10; // -200.0
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(6, 2023), DELTA,
+                "Gross calculation should be negative if hours worked is negative.");
     }
 
-    // Test case for calculateGross with large numbers to ensure double precision
+    // Test case for negative hourly rate and negative hours worked (should result in positive gross)
     @Test
-    void calculateGross_largeValues_shouldHandlePrecision() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT007", "Eve Red", "Admin", 12345.67, 160, 0.20);
-        double expectedGross = 12345.67 * 160; // 1975307.2
-        assertEquals(expectedGross, employee.calculateGross(7, 2023), DELTA);
+    @DisplayName("calculateGross: Should return positive gross for negative hourly rate and negative hours worked")
+    void calculateGross_NegativeHourlyRateAndHoursWorked_ReturnsPositiveGross() {
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT007", "Eve White", "IT", -15.0, -80, 0.08);
+        double expectedGross = -15.0 * -80; // 1200.0
+        assertEquals(expectedGross, partTimeEmployee.calculateGross(7, 2023), DELTA,
+                "Gross calculation should be positive if both hourly rate and hours worked are negative.");
     }
 
-    // Test case for getTaxRate with a positive tax rate
+    // Test case for positive tax rate
     @Test
-    void getTaxRate_positiveTaxRate_shouldReturnCorrectRate() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT008", "Frank Black", "HR", 15.0, 60, 0.12);
-        assertEquals(0.12, employee.getTaxRate(), DELTA);
+    @DisplayName("getTaxRate: Should return the correct positive tax rate")
+    void getTaxRate_PositiveTaxRate_ReturnsCorrectRate() {
+        double taxRate = 0.15;
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT001", "Jane Doe", "Sales", 25.0, 160, taxRate);
+        assertEquals(taxRate, partTimeEmployee.getTaxRate(), DELTA,
+                "getTaxRate should return the initialized positive tax rate.");
     }
 
-    // Test case for getTaxRate with a zero tax rate
+    // Test case for zero tax rate
     @Test
-    void getTaxRate_zeroTaxRate_shouldReturnZero() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT009", "Grace White", "Sales", 18.0, 70, 0.0);
-        assertEquals(0.0, employee.getTaxRate(), DELTA);
+    @DisplayName("getTaxRate: Should return zero for a zero tax rate")
+    void getTaxRate_ZeroTaxRate_ReturnsZero() {
+        double taxRate = 0.0;
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT008", "Frank Black", "Development", 40.0, 100, taxRate);
+        assertEquals(taxRate, partTimeEmployee.getTaxRate(), DELTA,
+                "getTaxRate should return zero for a zero tax rate.");
     }
 
-    // Test case for getTaxRate with a negative tax rate (unusual, but current implementation allows)
+    // Test case for a negative tax rate (unlikely but possible via constructor)
     @Test
-    void getTaxRate_negativeTaxRate_shouldReturnNegativeRate() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT010", "Harry Green", "Marketing", 22.0, 90, -0.05);
-        assertEquals(-0.05, employee.getTaxRate(), DELTA);
+    @DisplayName("getTaxRate: Should return negative for a negative tax rate")
+    void getTaxRate_NegativeTaxRate_ReturnsNegative() {
+        double taxRate = -0.05;
+        partTimeEmployee = new PaymentProcessor.PartTimeEmployee(
+                "PT009", "Grace Hall", "Support", 18.0, 120, taxRate);
+        assertEquals(taxRate, partTimeEmployee.getTaxRate(), DELTA,
+                "getTaxRate should return a negative value if initialized with one.");
     }
 
     // Test case for getType method
     @Test
-    void getType_shouldReturnPartTime() {
-        PaymentProcessor.PartTimeEmployee employee = new PaymentProcessor.PartTimeEmployee(
-                "PT011", "Ivy Yellow", "IT", 30.0, 100, 0.25);
-        assertEquals("PartTime", employee.getType());
+    @DisplayName("getType: Should return 'PartTime'")
+    void getType_ReturnsPartTime() {
+        assertEquals("PartTime", partTimeEmployee.getType(),
+                "getType should return 'PartTime' for a PartTimeEmployee.");
     }
 }
