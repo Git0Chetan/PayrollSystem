@@ -7,6 +7,10 @@
     <groupId>org.example</groupId>
     <artifactId>Test_Process</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Payroll System</name>
+    <description>A tiny in-memory payroll management system for testing and demos.</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -61,6 +65,18 @@
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
                         </goals>
                     </execution>
                 </executions>
