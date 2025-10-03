@@ -73,7 +73,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          # Do not fail on errors
+          # Details of recently test runs :
           set +e
           REPORT_DIR="target/surefire-reports"
 
