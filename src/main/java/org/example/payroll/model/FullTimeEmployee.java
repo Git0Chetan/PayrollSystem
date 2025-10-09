@@ -27,3 +27,5 @@ public class FullTimeEmployee extends Employee{
         return "FullTime";
     }
 }
+
+//Modification
